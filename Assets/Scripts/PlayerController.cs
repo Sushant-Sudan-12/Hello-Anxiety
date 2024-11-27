@@ -59,27 +59,42 @@ public class IsometricController : MonoBehaviour
     }
 
     void MoveCharacter()
+{
+    // Calculate the direction to move and the distance to the target
+    Vector3 directionToMove = (targetPosition - transform.position).normalized;
+    float distanceToTarget = Vector3.Distance(transform.position, targetPosition);
+
+    // Check for obstacles in the direction of movement
+    RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToMove, distanceToTarget, obstacleLayer);
+
+    if (hit.collider != null)
     {
-        // Check for obstacles around the player in all directions and ensure to stop at the desired distance
-        Vector3 directionToMove = (targetPosition - transform.position).normalized;
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToMove, stopDistance, obstacleLayer);
+        // If there's an obstacle, calculate the adjusted stopping point
+        float distanceToObstacle = hit.distance;
 
-        if (hit.collider != null)
-        {
-            // If there is an obstacle, adjust the movement to stop at the buffer distance
-            Vector3 hitPoint = hit.point - hit.normal * stopDistance;
-            targetPosition = hitPoint;
-        }
-
-        // Move the player towards the adjusted target position
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-
-        // Stop movement if close enough to the target position
-        if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
+        // Stop movement if within the stop distance from the obstacle
+        if (distanceToObstacle <= stopDistance)
         {
             isMoving = false;
+            return;
         }
+
+        // Adjust the target position to stop at the buffer distance from the obstacle
+        Vector3 hitPoint = (Vector3)hit.point - (Vector3)hit.normal * stopDistance;
+        targetPosition = hitPoint;
     }
+
+    // Stop movement if close enough to the target position
+    if (distanceToTarget < 0.1f)
+    {
+        isMoving = false;
+        return;
+    }
+
+    // Move the player towards the adjusted target position
+    transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+}
+
 
     void UpdateAnimation()
     {

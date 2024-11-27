@@ -6,16 +6,15 @@ public class DelayedObjectActivator : MonoBehaviour
     public GameObject firstObject;  // First object to activate
     public GameObject secondObject; // Second object to activate
 
-    private void Start()
-    {
-        // Start the coroutine that will handle the delays and activation
+    private void OnTriggerEnter2D(Collider2D other) {
+        if (other.tag == "Player") {}
         StartCoroutine(ActivateObjectsWithDelay());
     }
 
     private IEnumerator ActivateObjectsWithDelay()
     {
         // Wait for 20 seconds before activating the first object
-        yield return new WaitForSeconds(20f);
+        yield return new WaitForSeconds(1f);
         firstObject.SetActive(true);  // Activate the first object
 
         // Wait for 5 seconds before activating the second object

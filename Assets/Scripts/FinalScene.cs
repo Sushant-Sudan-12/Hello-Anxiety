@@ -3,12 +3,12 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement; // For reloading the scene
 using System.Collections;
 
-public class AnxietySystem : MonoBehaviour
+public class AnxietySystemFinal : MonoBehaviour
 {
     public Slider anxietySlider;
-    public float maxAnxiety = 100f;
+    public float maxAnxiety = 200f;
     public float minAnxiety = 0f;
-    public float currentAnxiety = 100f;
+    public float currentAnxiety = 200f;
     public float decreaseRateInDarkness = 1f; // Anxiety decrease per second in darkness
     public float increaseRateWithTorch = 4f; // Anxiety increase per second with torch
     public float rapidDecreaseRateWhenChased = 8f; // Anxiety decrease rate when chased
@@ -21,6 +21,8 @@ public class AnxietySystem : MonoBehaviour
     private bool isTorchActive = false;
     private bool isChased = false;
     private bool isIlluminateActive = false; // New variable for spotlight state
+    public GameObject firstObject;  
+    public GameObject secondObject; 
 
     void Start()
     {
@@ -91,7 +93,20 @@ public class AnxietySystem : MonoBehaviour
         yield return new WaitForSeconds(panicAttackDisplayDuration);
 
         // Reload the current scene after showing the message
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);      
+        StartCoroutine(ActivateObjectsWithDelay());    
+    }
+    private IEnumerator ActivateObjectsWithDelay()
+    {
+        // Wait for 20 seconds before activating the first object
+        yield return new WaitForSeconds(20f);
+        firstObject.SetActive(true);  // Activate the first object
+
+        // Wait for 5 seconds before activating the second object
+        yield return new WaitForSeconds(5f);
+        secondObject.SetActive(true);  // Activate the second object
+
+        yield return new WaitForSeconds(10f);
+        Application.Quit();
     }
 
     // Setters for the different anxiety factors
@@ -115,4 +130,3 @@ public class AnxietySystem : MonoBehaviour
         isIlluminateActive = value;
     }
 }
-

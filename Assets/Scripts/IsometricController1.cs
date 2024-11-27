@@ -19,15 +19,28 @@ public class IsometricController1 : MonoBehaviour
     // Layer mask for obstacles
     public LayerMask obstacleLayer;
 
+    // Predefined point for auto movement
+    public Transform predefinedTarget; // Assign in the Inspector
+
     private void Awake()
     {
         seeker = GetComponent<Seeker>();
+
         // Ensure the character is not affected by physics (keep it in the 2D plane)
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb)
         {
             rb.gravityScale = 0;
             rb.freezeRotation = true;
+        }
+    }
+
+    private void Start()
+    {
+        // Start automatic movement after 1 second
+        if (predefinedTarget != null)
+        {
+            Invoke(nameof(StartAutoMovement), 1.5f);
         }
     }
 
@@ -61,20 +74,15 @@ public class IsometricController1 : MonoBehaviour
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             mousePos.z = 0; // Ensure 2D movement on the plane
 
-            // Check if the mouse click is within the allowed circle radius
-            float distance = Vector3.Distance(transform.position, mousePos);
-            if (distance < stopDistance)
-            {
-                // Pathfinding is not needed, move directly
-                targetPosition = mousePos;
-                isMoving = true;
-            }
-            else
-            {
-                // Use pathfinding to calculate the path
-                seeker.StartPath(transform.position, mousePos, OnPathComplete);
-            }
+            // Use pathfinding to calculate the path
+            seeker.StartPath(transform.position, mousePos, OnPathComplete);
         }
+    }
+
+    void StartAutoMovement()
+    {
+        // Start pathfinding towards the predefined target
+        seeker.StartPath(transform.position, predefinedTarget.position, OnPathComplete);
     }
 
     // Callback when the pathfinding has completed
@@ -133,6 +141,7 @@ public class IsometricController1 : MonoBehaviour
         lastPosition = transform.position;
     }
 }
+
 // using UnityEngine;
 // using Pathfinding;
 
